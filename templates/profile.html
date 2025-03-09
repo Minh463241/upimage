@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Keiwei00 Hotel - Trang Cá Nhân</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome CDN -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet"/>
+  <!-- Custom CSS (nếu có) -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <!-- Inline CSS để tối ưu hiển thị ảnh -->
+  <style>
+    img {
+      /* Giúp hiển thị ảnh sắc nét hơn */
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+    }
+  </style>
+</head>
+<body class="font-roboto">
+  <!-- Header -->
+  <header class="bg-white shadow-md fixed w-full z-20">
+    <div class="container mx-auto flex justify-between items-center py-4 px-6">
+      <!-- Logo / Tên website -->
+      <div class="text-2xl font-light italic">
+        <a href="{{ url_for('index') }}">Keiwei00 Hotel</a>
+      </div>
+      <!-- Thanh điều hướng -->
+      <nav class="space-x-4">
+        <a class="text-gray-600 hover:text-gray-800" href="{{ url_for('index') }}">Trang Chủ</a>
+        <a class="text-gray-600 hover:text-gray-800" href="#">Phòng</a>
+        <a class="text-gray-600 hover:text-gray-800" href="#">Tiện Nghi</a>
+        <a class="text-gray-600 hover:text-gray-800" href="#">Liên Hệ</a>
+        <a class="text-gray-600 hover:text-gray-800" href="#">Giới Thiệu</a>
+      </nav>
+      <!-- Khu vực avatar / đăng nhập -->
+      <div class="flex items-center space-x-2">
+        {% if user_email %}
+          <!-- Khi đã đăng nhập, hiển thị avatar (chuyển hướng đến trang cá nhân) -->
+          <a href="{{ url_for('profile') }}" title="Trang cá nhân">
+            <img src="{{ url_for('static', filename='avatars/' ~ user_avatar) }}"
+                 srcset="{{ url_for('static', filename='avatars/' ~ user_avatar) }} 1x, {{ url_for('static', filename='avatars/' ~ user_avatar_hd) }} 2x"
+                 alt="User avatar"
+                 class="rounded-full"
+                 width="30"
+                 height="30">
+          </a>
+        {% else %}
+          <a class="text-gray-600 hover:text-gray-800" href="{{ url_for('auth_bp.login') }}">Đăng nhập</a>
+        {% endif %}
+        <!-- Chuyển đổi ngôn ngữ -->
+        <a class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+           href="{{ url_for('change_language', lang='en') }}">EN</a>
+        <a class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+           href="{{ url_for('change_language', lang='vi') }}">VI</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Phần nội dung chính -->
+  <main class="pt-24">
+    <section class="container mx-auto py-12">
+      <!-- Khối thông tin cá nhân -->
+      <div class="bg-white p-6 rounded-md shadow-md mb-6">
+        <h2 class="text-2xl font-semibold mb-4">Thông Tin Cá Nhân</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p><strong>Họ Tên:</strong> {{ customer.HoTen or "Chưa cập nhật" }}</p>
+            <p><strong>Email:</strong> {{ customer.Email }}</p>
+            <p><strong>Số điện thoại:</strong> {{ customer.DienThoai or "Chưa cập nhật" }}</p>
+          </div>
+          <div>
+            <p><strong>CCCD/Hộ chiếu:</strong> {{ customer.CMND or "Chưa cập nhật" }}</p>
+            <p><strong>Địa chỉ:</strong> {{ customer.DiaChi or "Chưa cập nhật" }}</p>
+          </div>
+        </div>
+        <!-- Nút chỉnh sửa thông tin cá nhân -->
+        <div class="mt-4">
+          <a href="{{ url_for('edit_profile') }}"
+             class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+            Chỉnh sửa thông tin
+          </a>
+        </div>
+      </div>
+
+      <!-- Khối lịch sử đặt phòng -->
+      <div class="bg-white p-6 rounded-md shadow-md mb-6">
+        <h2 class="text-2xl font-semibold mb-4">Lịch Sử Đặt Phòng</h2>
+        {% if booking_history and booking_history|length > 0 %}
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead>
+              <tr>
+                <th class="px-4 py-2">Phòng</th>
+                <th class="px-4 py-2">Tình Trạng</th>
+                <th class="px-4 py-2">Ngày Nhận</th>
+                <th class="px-4 py-2">Ngày Trả</th>
+                <th class="px-4 py-2">Hủy</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              {% for booking in booking_history %}
+              <tr>
+                <td class="px-4 py-2">Phòng {{ booking.SoPhong }}</td>
+                <td class="px-4 py-2">{{ booking.TrangThai }}</td>
+                <td class="px-4 py-2">{{ booking.NgayNhan|date_format("%d/%m/%Y") }}</td>
+                <td class="px-4 py-2">{{ booking.NgayTra|date_format("%d/%m/%Y") }}</td>
+                <td class="px-4 py-2">
+                  {% if booking.allow_cancel %}
+                    <form action="{{ url_for('cancel_booking', booking_id=booking._id) }}" method="POST">
+                      <button type="submit"
+                              class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">
+                        Hủy
+                      </button>
+                    </form>
+                  {% else %}
+                    <span class="text-gray-500">Không cho phép</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p>Chưa có lịch sử đặt phòng.</p>
+        {% endif %}
+      </div>
+
+      <!-- Khối dịch vụ đã sử dụng -->
+      <div class="bg-white p-6 rounded-md shadow-md">
+        <h2 class="text-2xl font-semibold mb-4">Dịch Vụ Đã Sử Dụng</h2>
+        {% if services_used and services_used|length > 0 %}
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead>
+              <tr>
+                <th class="px-4 py-2">Dịch vụ</th>
+                <th class="px-4 py-2">Ngày sử dụng</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              {% for service in services_used %}
+              <tr>
+                <td class="px-4 py-2">{{ service.TenDichVu }}</td>
+                <td class="px-4 py-2">{{ service.NgaySuDung|date_format("%d/%m/%Y") }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p>Bạn chưa sử dụng dịch vụ nào.</p>
+        {% endif %}
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white text-center py-4">
+    <p>© 2025 Keiwei00 Hotel</p>
+  </footer>
+
+  <!-- External JS -->
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

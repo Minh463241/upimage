@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trang Đăng Ký</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <!-- File CSS riêng (dùng login.css để giữ giao diện nhất quán) -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+</head>
+<body class="bg-gray-200 flex items-center justify-center min-h-screen">
+  <div class="relative w-full max-w-md">
+    <!-- Các hình gradient nền -->
+    <div class="absolute top-0 left-0 w-40 h-40 bg-gradient-to-r from-pink-500 to-yellow-500 rounded-full mix-blend-multiply filter blur-xl opacity-70"></div>
+    <div class="absolute top-0 right-0 w-40 h-40 bg-gradient-to-r from-yellow-500 to-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-70"></div>
+    <div class="absolute bottom-0 left-0 w-40 h-40 bg-gradient-to-r from-teal-500 to-green-500 rounded-full mix-blend-multiply filter blur-xl opacity-70"></div>
+    <div class="absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-70"></div>
+    
+    <!-- Form Register -->
+    <div class="relative bg-white shadow-lg rounded-lg p-8">
+      <h2 class="text-gray-700 text-2xl mb-6">Đăng Ký</h2>
+      <form id="registerForm" method="post" action="{{ url_for('register') }}">
+        <div class="mb-4">
+          <label class="block text-gray-600 text-sm mb-2" for="ho_ten">Họ tên</label>
+          <input class="w-full px-3 py-2 border border-gray-300 rounded" type="text" name="ho_ten" id="ho_ten" placeholder="Nhập họ tên" required>
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-600 text-sm mb-2" for="email">Email</label>
+          <input class="w-full px-3 py-2 border border-gray-300 rounded" type="email" name="email" id="email" placeholder="Nhập email" required>
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-600 text-sm mb-2" for="password">Mật khẩu</label>
+          <input class="w-full px-3 py-2 border border-gray-300 rounded" type="password" name="password" id="password" placeholder="Nhập mật khẩu" required>
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-600 text-sm mb-2" for="phone">Điện thoại</label>
+          <input class="w-full px-3 py-2 border border-gray-300 rounded" type="text" name="phone" id="phone" placeholder="Nhập số điện thoại" required>
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-600 text-sm mb-2" for="dia_chi">Địa chỉ</label>
+          <input class="w-full px-3 py-2 border border-gray-300 rounded" type="text" name="dia_chi" id="dia_chi" placeholder="Nhập địa chỉ" >
+        </div>
+        <div class="mb-6">
+          <label class="block text-gray-600 text-sm mb-2" for="cmnd">CMND/CCCD</label>
+          <input class="w-full px-3 py-2 border border-gray-300 rounded" type="text" name="cmnd" id="cmnd" placeholder="Nhập số CMND hoặc CCCD" >
+        </div>
+        <div class="mb-6 text-right">
+          <a href="{{ url_for('login') }}" class="text-gray-500 text-sm">Đã có tài khoản? Đăng nhập</a>
+        </div>
+        <div class="flex">
+          <button type="submit" class="w-full py-2 bg-gray-800 text-white rounded">Đăng Ký</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- File JS riêng (có thể dùng chung với login.js nếu cần) -->
+  <script src="{{ url_for('static', filename='login.js') }}"></script>
+</body>
+</html>
