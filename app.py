@@ -1,3 +1,4 @@
+import io
 import os
 import hashlib
 import urllib.parse
@@ -303,29 +304,31 @@ def add_room():
         room_types = get_all_room_types()
         return render_template('add_room.html', room_types=room_types)
     
-    try:
-        so_phong = request.form.get('room_number')
-        ma_loai_phong = request.form.get('room_type')
-        mo_ta = request.form.get('description')
-        trang_thai = "Trống"
-        
-        file = request.files.get('room_image')
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(file_path)
-            # Hàm add_room_with_image sẽ upload ảnh lên Cloudinary qua hàm upload_file_to_cloudinary
-            add_room_with_image(file_path, filename, so_phong, ma_loai_phong, mo_ta, image_description="Ảnh phòng", trang_thai=trang_thai)
-        else:
-            add_room_to_db(so_phong, ma_loai_phong, mo_ta, trang_thai)
-        
-        flash("Thêm phòng thành công!", "success")
+    # Lấy thông tin từ form
+    so_phong = request.form.get('room_number')
+    ma_loai_phong = request.form.get('room_type')
+    mo_ta = request.form.get('description')
+    trang_thai = "Trống"
+    
+    if not ma_loai_phong or not ma_loai_phong.strip():
+        flash("Chưa chọn loại phòng.", "error")
         return redirect(url_for('add_room'))
     
-    except Exception as e:
-        flash(f"Lỗi khi thêm phòng: {str(e)}", "error")
-        return redirect(url_for('add_room'))
-
+    file = request.files.get('room_image')
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        # Đọc file vào bộ nhớ mà không lưu tạm trên đĩa
+        file_bytes = file.read()
+        file_stream = io.BytesIO(file_bytes)
+        file_stream.seek(0)  # Đảm bảo con trỏ file ở đầu file
+        # Gọi hàm add_room_with_image với file_stream thay vì file path
+        add_room_with_image(file_stream, f"room_{filename}", so_phong, ma_loai_phong, mo_ta, "", trang_thai)
+    else:
+        # Nếu không có file ảnh hợp lệ, chỉ thêm thông tin phòng
+        add_room_to_db(so_phong, ma_loai_phong, mo_ta, trang_thai)
+    
+    flash("Thêm phòng thành công!", "success")
+    return redirect(url_for('add_room'))
 
 
 # -------------------------------
