@@ -528,6 +528,21 @@ def stripe_cancel():
     flash("Thanh toán đã bị hủy!", "error")
     return redirect(url_for('index'))
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # -------------------------------
 # ROUTE: Quản trị Admin (các route admin khác giữ nguyên)
 # -------------------------------

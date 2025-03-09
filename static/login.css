@@ -1,0 +1,15 @@
+/* login.css */
+
+/* Custom focus styles cho input và button */
+input:focus {
+  outline: none;
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2);
+}
+
+button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2);
+}
+
+/* Nếu cần bổ sung thêm style tùy chỉnh, bạn có thể thêm ở đây */

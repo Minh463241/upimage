@@ -54,16 +54,6 @@ def update_customer(email, update_data):
     return result.modified_count
 
 # ---------------------------
-# ẢNH PHÒNG
-# ---------------------------
-def create_room_image(room_image_data):
-    result = room_images_collection.insert_one(room_image_data)
-    return str(result.inserted_id)
-
-def get_room_images_by_room(ma_phong):
-    return list(room_images_collection.find({'MaPhong': ma_phong}))
-
-# ---------------------------
 # ĐẶT PHÒNG
 # ---------------------------
 def create_booking(booking_data):
@@ -136,6 +126,17 @@ def create_room_type(room_type_data):
 
 # Alias để dùng trong app
 add_room_type = create_room_type
+
+
+# ---------------------------
+# ẢNH PHÒNG
+# ---------------------------
+def create_room_image(room_image_data):
+    result = room_images_collection.insert_one(room_image_data)
+    return str(result.inserted_id)
+
+def get_room_images_by_room(ma_phong):
+    return list(room_images_collection.find({'MaPhong': ma_phong}))
 
 def add_room_to_db(so_phong, ma_loai_phong, mo_ta, trang_thai):
     try:
