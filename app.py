@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 import cloudinary
 import pymongo
 from datetime import datetime
-import mongondb  # module quản lý MongoDB của bạn
-from upload_cloudinary import upload_image  # Import hàm upload từ file riêng
+import mongondb  # Module quản lý MongoDB của bạn
+from upload_cloudinary import upload_image  # Hàm upload từ file riêng
 
 # Load biến môi trường từ file .env
 load_dotenv()
@@ -15,15 +15,26 @@ app = Flask(__name__)
 # Cấu hình Cloudinary từ biến môi trường (sử dụng CLOUDINARY_URL)
 cloudinary.config(secure=True)
 
+# --- Route: Trang chủ ---
+@app.route("/")
+def home():
+    return render_template_string('''
+        <h1>Chào mừng đến với ứng dụng quản lý khách sạn!</h1>
+        <p>
+            <a href="{{ url_for('list_rooms') }}">Xem danh sách phòng</a> |
+            <a href="{{ url_for('add_room') }}">Thêm phòng</a>
+        </p>
+    ''')
+
 # --- Route: Thêm phòng ---
 @app.route("/add_room", methods=["GET", "POST"])
 def add_room():
     if request.method == "POST":
-        so_phong     = request.form.get("so_phong")
+        so_phong      = request.form.get("so_phong")
         ma_loai_phong = request.form.get("ma_loai_phong")
-        mo_ta        = request.form.get("mo_ta")
-        trang_thai   = request.form.get("trang_thai", "Trống")
-        image_file   = request.files.get("room_image")
+        mo_ta         = request.form.get("mo_ta")
+        trang_thai    = request.form.get("trang_thai", "Trống")
+        image_file    = request.files.get("room_image")
 
         image_url = None
         if image_file:
