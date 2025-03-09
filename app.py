@@ -1,18 +1,28 @@
 import os
+
+# Gán trực tiếp các biến môi trường (cho mục đích thử nghiệm)
+os.environ['MONGO_URI'] = "mongodb+srv://minh:123@cluster0.wcrhx.mongodb.net/qlksda?retryWrites=true&w=majority&appName=Cluster0"
+os.environ['DB_NAME'] = "qlksda"
+os.environ['CLOUDINARY_URL'] = "cloudinary://648677879979597:-1D5fNq5hrtfGoIeZ8U7n8GHWi0@dwczro6hp"
+
+# Nếu dùng Flask >=2.2.5, cần patch Werkzeug nếu thiếu hàm url_quote
+import werkzeug.urls
+if not hasattr(werkzeug.urls, 'url_quote'):
+    from urllib.parse import quote
+    def url_quote(s, safe="/"):
+        return quote(s, safe=safe)
+    werkzeug.urls.url_quote = url_quote
+
 from flask import Flask, request, render_template_string, redirect, url_for
-from dotenv import load_dotenv
 import cloudinary
 import pymongo
 from datetime import datetime
-import mongondb  # Module quản lý MongoDB của bạn
-from upload_cloudinary import upload_image  # Hàm upload từ file riêng
-
-# Load biến môi trường từ file .env
-load_dotenv()
+import mongondb  # Module quản lý MongoDB (sử dụng os.environ để lấy MONGO_URI, DB_NAME)
+from upload_cloudinary import upload_image  # Hàm upload ảnh lên Cloudinary
 
 app = Flask(__name__)
 
-# Cấu hình Cloudinary từ biến môi trường (sử dụng CLOUDINARY_URL)
+# Cấu hình Cloudinary (lấy từ biến môi trường CLOUDINARY_URL)
 cloudinary.config(secure=True)
 
 # --- Route: Trang chủ ---
@@ -38,7 +48,7 @@ def add_room():
 
         image_url = None
         if image_file:
-            # Sử dụng hàm upload_image() từ file upload_cloudinary.py
+            # Sử dụng hàm upload_image() từ file upload_cloudinary.py để upload ảnh lên Cloudinary
             image_url = upload_image(image_file)
         
         # Tạo dữ liệu phòng với trường image_url (nếu có)
@@ -51,10 +61,10 @@ def add_room():
             "image_url": image_url  # Lưu đường dẫn ảnh
         }
         
-        # Sử dụng hàm create_room() từ module mongondb.py để lưu vào MongoDB
+        # Lưu dữ liệu phòng vào MongoDB qua module mongondb.py
         room_id = mongondb.create_room(room_data)
         
-        # Nếu có ảnh, lưu thông tin ảnh vào collection room_images (tùy chọn)
+        # Nếu có ảnh, lưu thêm thông tin ảnh vào collection room_images (tùy chọn)
         if image_url:
             room_image_data = {
                 "MaPhong": room_id,          # Liên kết với phòng vừa tạo
@@ -66,7 +76,7 @@ def add_room():
         
         return redirect(url_for("list_rooms"))
     
-    # Form thêm phòng
+    # Hiển thị form thêm phòng
     return render_template_string('''
         <h1>Thêm phòng</h1>
         <form method="POST" enctype="multipart/form-data">
