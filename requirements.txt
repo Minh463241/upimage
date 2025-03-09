@@ -1,5 +1,7 @@
-Flask==2.0.3
+Flask>=2.2.5
 python-dotenv==1.0.0
 cloudinary==1.29.0
 pymongo==4.2.0
-Werkzeug==2.0.3
+Werkzeug>=2.2.2
+dnspython==2.3.0
+Flask-SQLAlchemy==3.1.1
