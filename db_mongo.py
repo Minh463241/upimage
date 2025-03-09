@@ -159,29 +159,39 @@ def add_room_to_db(so_phong, ma_loai_phong, mo_ta, trang_thai):
     return create_room(room_data)
 
 def add_room_with_image(file_stream, filename, so_phong, ma_loai_phong, mo_ta, image_description, trang_thai):
-    # Tạo phòng mới và lấy ID phòng
-    room_id = add_room_to_db(so_phong, ma_loai_phong, mo_ta, trang_thai)
-    print(f"[DEBUG] Phòng được tạo với room_id: {room_id}")
-    
-    # Sử dụng hàm upload từ file drive_upload.py với file stream
     from upload_cloudinary import upload_image
-    image_url = upload_image(file_stream, filename)
-    print(f"[DEBUG] Image URL: {image_url}")
-    
-    room_image_data = {
-        'MaAnh': None,
-        'MaPhong': room_id,         # Liên kết ảnh với phòng vừa tạo
-        'DuongDanAnh': image_url,   # URL ảnh từ Google Drive
-        'MoTa': image_description,
-        'uploaded_at': datetime.utcnow()
-    }
-    create_room_image(room_image_data)
-    
-    # Cập nhật document phòng với thông tin ảnh
-    update_room(room_id, {'image_url': image_url, 'image_url_hd': image_url})
-    
-    return room_id
+    try:
+        # Tạo phòng mới và lấy ID phòng
+        room_id = add_room_to_db(so_phong, ma_loai_phong, mo_ta, trang_thai)
+        print(f"[DEBUG] Phòng được tạo với room_id: {room_id}")
 
+        # Upload ảnh và kiểm tra kết quả
+        try:
+            image_url = upload_image(file_stream)  # Chỉ truyền 1 tham số nếu upload_image chỉ nhận file_stream
+            print(f"[DEBUG] Image URL: {image_url}")
+        except Exception as e:
+            print(f"[ERROR] Lỗi khi upload ảnh: {e}")
+            image_url = ""  # Nếu lỗi, để trống URL ảnh
+
+        # Dữ liệu ảnh liên kết với phòng
+        room_image_data = {
+            'MaAnh': None,
+            'MaPhong': room_id,         # Liên kết ảnh với phòng vừa tạo
+            'DuongDanAnh': image_url,   # URL ảnh từ Cloudinary / Google Drive
+            'MoTa': image_description,
+            'uploaded_at': datetime.utcnow()
+        }
+        create_room_image(room_image_data)
+
+        # Cập nhật document phòng với thông tin ảnh (nếu có ảnh)
+        if image_url:
+            update_room(room_id, {'image_url': image_url, 'image_url_hd': image_url})
+
+        return room_id
+
+    except Exception as e:
+        print(f"[ERROR] Lỗi khi thêm phòng: {e}")
+        return None  # Trả về None nếu có lỗi xảy ra
 
 # ---------------------------
 # PHÒNG
