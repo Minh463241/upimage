@@ -19,8 +19,12 @@ import pymongo
 from datetime import datetime
 import mongondb  # Module quản lý MongoDB (sử dụng os.environ để lấy MONGO_URI, DB_NAME)
 from upload_cloudinary import upload_image  # Hàm upload ảnh lên Cloudinary
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)  # Thêm CORS vào toàn bộ ứng dụng
+
+
 
 # Cấu hình Cloudinary (lấy từ biến môi trường CLOUDINARY_URL)
 cloudinary.config(secure=True)

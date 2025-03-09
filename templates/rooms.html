@@ -1,15 +1,51 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Danh sách phòng</title>
-  </head>
-  <body>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .room-container {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        img {
+            max-width: 200px;
+            height: auto;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
     <h1>Danh sách phòng</h1>
-    {% for room in rooms %}
-      <h3>{{ room.room_name }}</h3>
-      {% if room.image_url %}
-        <img src="{{ room.image_url }}" alt="Room Image" style="max-width: 200px;">
-      {% endif %}
-    {% endfor %}
-  </body>
+
+    {% if rooms %}
+        {% for room in rooms %}
+        <div class="room-container">
+            <h3>Phòng số: {{ room.SoPhong }}</h3>
+            <p><b>Mô tả:</b> {{ room.MoTa or "Không có mô tả" }}</p>
+            <p><b>Trạng thái:</b> {{ room.TrangThai or "Không rõ" }}</p>
+            {% if room.image_url %}
+                <img src="{{ room.image_url }}" alt="Ảnh phòng {{ room.SoPhong }}">
+            {% else %}
+                <img src="/static/default_room.jpg" alt="Ảnh mặc định">
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>Không có phòng nào trong hệ thống.</p>
+    {% endif %}
+
+    <br><br>
+    <a href="/">🏠 Quay lại trang chủ</a> | <a href="/add_room">➕ Thêm phòng</a>
+</body>
 </html>
