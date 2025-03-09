@@ -6,7 +6,7 @@ from werkzeug.utils import secure_filename
 import functools
 from datetime import timedelta, datetime
 import hmac
-
+import stripe
 import cloudinary
 import cloudinary.uploader
 # Cấu hình Cloudinary trực tiếp trong app.py
@@ -46,7 +46,7 @@ from db_mongo import (
 # -------------------------------
 # Cài đặt Stripe
 # -------------------------------
-import stripe
+
 stripe.api_key = "sk_test_51QzvBe4ItrNbWOZiuMzul21da8fG1mtQa5hj4nznqqje0PbD0zKUpKekh4rcQWlSrSnlzrCknEPAqAKYQdbpmNTs00u4BJTBxR"
 
 app = Flask(__name__)
