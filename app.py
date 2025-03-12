@@ -20,6 +20,7 @@ cloudinary.config(
 
 # Import các hàm từ db_mongo.py (MongoDB)
 from db_mongo import (
+    rooms_collection,
     create_customer,
     get_customer_by_email,
     update_last_login,
@@ -101,14 +102,71 @@ def index():
 # -------------------------------
 # ROUTE: Tìm kiếm (hiển thị lại trang chủ)
 # -------------------------------
+from flask import flash, redirect, url_for
+
 @app.route('/search', methods=['GET'])
 def search():
-    destination = request.args.get('destination')
+    # Lấy dữ liệu từ GET parameters
     checkin = request.args.get('checkin')
     checkout = request.args.get('checkout')
-    guests = request.args.get('guests')
-    print("Search data:", destination, checkin, checkout, guests)
-    return render_template('index.html')
+    adults = request.args.get('adults')
+    children = request.args.get('children')
+    popular = request.args.get('popular')
+    tiennghi = request.args.get('tiennghi')
+    xephang = request.args.get('xephang')
+    rating = request.args.get('rating')
+    description = request.args.get('description')
+    
+    # Kiểm tra các trường bắt buộc: ví dụ, checkin, checkout, số người lớn và trẻ em
+    if not checkin or not checkout or not adults or not children:
+        flash("Vui lòng nhập đầy đủ thông tin tìm kiếm!", "error")
+        return redirect(url_for('index'))
+    
+    # Xây dựng dictionary chứa các bộ lọc để có thể sử dụng cho việc render lại form nếu cần
+    filters = {
+        "checkin": checkin,
+        "checkout": checkout,
+        "adults": adults,
+        "children": children,
+        "popular": popular,
+        "tiennghi": tiennghi,
+        "xephang": xephang,
+        "rating": rating,
+        "description": description
+    }
+    
+    # Xây dựng truy vấn MongoDB dựa trên dữ liệu tìm kiếm
+    query = {}
+    
+    # Nếu người dùng nhập mô tả/tính năng cần tìm
+    if description:
+        query["MoTa"] = {"$regex": description, "$options": "i"}
+    # Bạn cũng có thể kết hợp với các bộ lọc khác, ví dụ:
+    if tiennghi:
+        # Nếu cần tìm kiếm theo tiện nghi (có thể dùng cùng trường MoTa hoặc một trường riêng)
+        query["MoTa"] = {"$regex": tiennghi, "$options": "i"}
+    
+    # In ra truy vấn để debug (sau này có thể bỏ đi)
+    print("[DEBUG] Query tìm kiếm:", query)
+    
+    # Thực hiện tìm kiếm trong rooms_collection (đã được import từ db_mongo)
+    rooms = list(rooms_collection.find(query))
+    
+    # Nếu không có kết quả, hiển thị thông báo
+    if not rooms:
+        flash("Không tìm thấy kết quả phù hợp!", "info")
+    
+    return render_template('index.html', 
+                           rooms=rooms,
+                           checkin=checkin,
+                           checkout=checkout,
+                           adults=adults,
+                           children=children,
+                           filter_popular=popular,
+                           filter_tiennghi=tiennghi,
+                           filter_xephang=xephang,
+                           filter_rating=rating,
+                           description=description)
 
 # -------------------------------
 # ROUTE: Đăng nhập
@@ -339,7 +397,7 @@ def profile():
     # Kiểm tra nếu khách hàng đã đăng nhập
     if 'email' not in session:
         flash("Bạn cần đăng nhập để xem trang cá nhân.", "error")
-        return redirect(url_for('auth_bp.login'))
+        return redirect(url_for('login'))
     
     email = session['email']
     customer = get_customer_by_email(email)
@@ -350,11 +408,27 @@ def profile():
     
     booking_history = get_booking_history_by_customer(email)
     services_used = get_services_used_by_customer(email)
-    
+    #Khi render template, truyền thêm các biến cần thiết từ session vào
+    # Giả sử customer có thuộc tính avatar và avatar_hd
     return render_template('profile.html',
                            customer=customer,
                            booking_history=booking_history,
-                           services_used=services_used)
+                           services_used=services_used,
+                           user_email=email,
+                           user_avatar=customer.avatar if hasattr(customer, 'avatar') else 'default.png',
+                           user_avatar_hd=customer.avatar_hd if hasattr(customer, 'avatar_hd') else 'default_hd.png')
+#Nếu bạn muốn các biến này có sẵn ở mọi template mà không cần phải truyền thủ công mỗi lần, bạn có thể tạo một hàm context processor như sau:
+@app.context_processor
+def inject_user():
+    if 'email' in session:
+        # Giả sử bạn có thể truy xuất thông tin avatar từ customer hoặc session
+        return {
+            'user_email': session['email'],
+            'user_avatar': session.get('user_avatar', 'default.png'),
+            'user_avatar_hd': session.get('user_avatar_hd', 'default_hd.png')
+        }
+    return {'user_email': None}
+
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 def edit_profile():

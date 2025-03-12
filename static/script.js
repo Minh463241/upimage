@@ -42,6 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
       chatBox.classList.add('hidden');
     });
   }
+ 
 
   // Gửi tin nhắn chat và xử lý phản hồi từ server LLM
   const chatSendButton = document.getElementById('chat-send');
@@ -85,3 +86,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
+setTimeout(function(){
+  var flashMessages = document.getElementById('flash-messages');
+  if (flashMessages) {
+    flashMessages.style.display = 'none';
+  }
+}, 3000);

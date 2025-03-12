@@ -225,6 +225,48 @@ def get_room_by_id(ma_phong):
 def update_room(ma_phong, update_data):
     result = rooms_collection.update_one({'MaPhong': ma_phong}, {'$set': update_data})
     return result.modified_count
+#tìm kiếm phòng
+def get_rooms_by_filters(filters):
+    """
+    filters: dict chứa các tiêu chí tìm kiếm. Ví dụ:
+      {
+         "description": "wifi",
+         "popular": "hot",
+         "tiennghi": "hồ bơi",
+         "xephang": "5",
+         "rating": "9"
+      }
+    Chúng ta sẽ xây dựng truy vấn dựa trên các trường này, chủ yếu tìm trong trường "MoTa".
+    """
+    query = {}
+    
+    # Nếu người dùng nhập tìm kiếm theo mô tả/tính năng:
+    if filters.get("description"):
+        query["MoTa"] = {"$regex": filters["description"], "$options": "i"}
+    
+    # Nếu có thêm các bộ lọc khác (ví dụ: tiennghi, popular,...), ta có thể kết hợp với $and
+    additional_conditions = []
+    if filters.get("tiennghi"):
+        additional_conditions.append({"MoTa": {"$regex": filters["tiennghi"], "$options": "i"}})
+    if filters.get("popular"):
+        additional_conditions.append({"MoTa": {"$regex": filters["popular"], "$options": "i"}})
+    if filters.get("xephang"):
+        additional_conditions.append({"MoTa": {"$regex": filters["xephang"], "$options": "i"}})
+    if filters.get("rating"):
+        additional_conditions.append({"MoTa": {"$regex": filters["rating"], "$options": "i"}})
+    
+    if additional_conditions:
+        if query:
+            # Nếu query đã có điều kiện tìm kiếm theo mô tả, kết hợp với điều kiện bổ sung
+            query = {"$and": [query] + additional_conditions}
+        else:
+            # Nếu chưa có, chỉ sử dụng các điều kiện bổ sung
+            query = {"$and": additional_conditions}
+    
+    # In ra query để debug
+    print("[DEBUG] Query tìm kiếm:", query)
+    return list(rooms_collection.find(query))
+
 
 # ---------------------------
 # NHÂN VIÊN (Admin)

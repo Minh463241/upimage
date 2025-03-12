@@ -7,7 +7,7 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Font Awesome CDN -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet"/>
   <!-- Custom CSS -->
@@ -15,6 +15,7 @@
   <!-- Inline CSS để tối ưu hiển thị ảnh -->
   <style>
     img {
+      /* Giúp hiển thị ảnh sắc nét hơn */
       image-rendering: -webkit-optimize-contrast;
       image-rendering: crisp-edges;
     }
@@ -39,7 +40,10 @@
           <a href="{{ url_for('profile') }}" title="Trang cá nhân">
             <img src="{{ url_for('static', filename='avatars/' ~ user_avatar) }}"
                  srcset="{{ url_for('static', filename='avatars/' ~ user_avatar) }} 1x, {{ url_for('static', filename='avatars/' ~ user_avatar_hd) }} 2x"
-                 alt="User avatar" class="rounded-full" width="30" height="30">
+                 alt="User avatar"
+                 class="rounded-full"
+                 width="30"
+                 height="30">
           </a>
         {% else %}
           <a class="text-gray-600 hover:text-gray-800" href="{{ url_for('login') }}">Đăng nhập</a>
@@ -52,7 +56,20 @@
 
   <!-- Nội dung chính -->
   <main class="pt-24">
-    <!-- Hero Section -->
+    <!-- Flash Messages (chỉ hiển thị khi có thông báo) -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div id="flash-messages" class="container mx-auto mt-4">
+          {% for category, message in messages %}
+            <div class="p-4 mb-4 text-sm text-{{ 'red' if category == 'error' else 'blue' }}-700 bg-{{ 'red' if category == 'error' else 'blue' }}-100 rounded">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Hero Section & Form tìm kiếm -->
     <section class="relative h-[600px]">
       <div class="slider">
         <img src="{{ url_for('static', filename='images/ks1.jpg') }}"
@@ -69,105 +86,119 @@
       <div class="hero-content flex items-center justify-center h-full text-center text-white">
         <div class="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-3/4 lg:w-2/3 text-gray-800">
           <h2 class="text-xl font-bold mb-4">Tìm Phòng</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div>
-              <label for="checkin" class="block font-medium mb-1">Ngày Nhận Phòng</label>
-              <input type="date" id="checkin" placeholder="YYYY-MM-DD" class="w-full border-gray-300 rounded-md px-3 py-2">
+          <form action="{{ url_for('search') }}" method="get">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div>
+                <label class="block font-medium mb-1" for="checkin">Ngày Nhận Phòng</label>
+                <input name="checkin" class="w-full border-gray-300 rounded-md px-3 py-2" id="checkin" placeholder="YYYY-MM-DD" type="date" value="{{ checkin|default('') }}" required/>
+              </div>
+              <div>
+                <label class="block font-medium mb-1" for="checkout">Ngày Trả Phòng</label>
+                <input name="checkout" class="w-full border-gray-300 rounded-md px-3 py-2" id="checkout" placeholder="YYYY-MM-DD" type="date" value="{{ checkout|default('') }}" required/>
+              </div>
+              <div>
+                <label class="block font-medium mb-1" for="adults">Người Lớn</label>
+                <select name="adults" class="w-full border-gray-300 rounded-md px-3 py-2" id="adults" required>
+                  <option value="1" {% if adults == '1' %}selected{% endif %}>1</option>
+                  <option value="2" {% if adults == '2' %}selected{% endif %}>2</option>
+                  <option value="3" {% if adults == '3' %}selected{% endif %}>3</option>
+                  <option value="4" {% if adults == '4' %}selected{% endif %}>4</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-medium mb-1" for="children">Trẻ Em</label>
+                <select name="children" class="w-full border-gray-300 rounded-md px-3 py-2" id="children" required>
+                  <option value="0" {% if children == '0' %}selected{% endif %}>0</option>
+                  <option value="1" {% if children == '1' %}selected{% endif %}>1</option>
+                  <option value="2" {% if children == '2' %}selected{% endif %}>2</option>
+                  <option value="3" {% if children == '3' %}selected{% endif %}>3</option>
+                  <option value="4" {% if children == '4' %}selected{% endif %}>4</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-medium mb-1" for="description">Mô tả / Tiện nghi</label>
+                <input name="description" class="w-full border-gray-300 rounded-md px-3 py-2" id="description" placeholder="Ví dụ: wifi, hồ bơi..." value="{{ description|default('') }}"/>
+              </div>
+              <div class="flex items-end">
+                <button type="submit" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-md w-full">
+                  Tìm Phòng
+                </button>
+              </div>
             </div>
-            <div>
-              <label for="checkout" class="block font-medium mb-1">Ngày Trả Phòng</label>
-              <input type="date" id="checkout" placeholder="YYYY-MM-DD" class="w-full border-gray-300 rounded-md px-3 py-2">
+            <!-- Bộ lọc bổ sung -->
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <label class="block font-medium mb-1" for="popular">Bộ lọc phổ biến</label>
+                <select name="popular" id="popular" class="border border-gray-300 rounded px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-teal-500">
+                  <option value="">Chọn</option>
+                  <option value="hot" {% if filter_popular == 'hot' %}selected{% endif %}>Hot</option>
+                  <option value="giamgia" {% if filter_popular == 'giamgia' %}selected{% endif %}>Giảm giá</option>
+                  <option value="mienphi" {% if filter_popular == 'mienphi' %}selected{% endif %}>Miễn phí hủy</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-medium mb-1" for="tiennghi">Tiện nghi</label>
+                <select name="tiennghi" id="tiennghi" class="border border-gray-300 rounded px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-teal-500">
+                  <option value="">Chọn</option>
+                  <option value="wifi" {% if filter_tiennghi == 'wifi' %}selected{% endif %}>Wi-Fi miễn phí</option>
+                  <option value="hovoi" {% if filter_tiennghi == 'hovoi' %}selected{% endif %}>Hồ bơi</option>
+                  <option value="dondonbay" {% if filter_tiennghi == 'dondonbay' %}selected{% endif %}>Đưa đón sân bay</option>
+                  <option value="phonggiadinh" {% if filter_tiennghi == 'phonggiadinh' %}selected{% endif %}>Phòng gia đình</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-medium mb-1" for="xephang">Xếp hạng</label>
+                <select name="xephang" id="xephang" class="border border-gray-300 rounded px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-teal-500">
+                  <option value="">Chọn</option>
+                  <option value="5" {% if filter_xephang == '5' %}selected{% endif %}>5 sao</option>
+                  <option value="4" {% if filter_xephang == '4' %}selected{% endif %}>4 sao</option>
+                  <option value="3" {% if filter_xephang == '3' %}selected{% endif %}>3 sao</option>
+                  <option value="2" {% if filter_xephang == '2' %}selected{% endif %}>2 sao</option>
+                  <option value="1" {% if filter_xephang == '1' %}selected{% endif %}>1 sao</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-medium mb-1" for="rating">Điểm đánh giá</label>
+                <select name="rating" id="rating" class="border border-gray-300 rounded px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-teal-500">
+                  <option value="">Chọn</option>
+                  <option value="9" {% if filter_rating == '9' %}selected{% endif %}>9+ Xuất sắc</option>
+                  <option value="8" {% if filter_rating == '8' %}selected{% endif %}>8+ Rất tốt</option>
+                  <option value="7" {% if filter_rating == '7' %}selected{% endif %}>7+ Tốt</option>
+                </select>
+              </div>
             </div>
-            <div>
-              <label for="adults" class="block font-medium mb-1">Người Lớn</label>
-              <select id="adults" class="w-full border-gray-300 rounded-md px-3 py-2">
-                <option>1</option>
-                <option>2</option>
-                <option>3</option>
-                <option>4</option>
-              </select>
-            </div>
-            <div>
-              <label for="children" class="block font-medium mb-1">Trẻ Em</label>
-              <select id="children" class="w-full border-gray-300 rounded-md px-3 py-2">
-                <option>1</option>
-                <option>2</option>
-                <option>3</option>
-                <option>4</option>
-              </select>
-            </div>
-            <div class="flex items-end">
-              <button class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-md w-full">Tìm Phòng</button>
-            </div>
-          </div>
+          </form>
         </div>
       </div>
     </section>
 
     <!-- Danh mục phòng -->
     <section class="container mx-auto py-12">
-      <div class="bg-white rounded-lg shadow p-4 mb-8">
-        <div class="flex flex-col md:flex-row items-center justify-between">
-          <h2 class="text-3xl font-bold mb-4 md:mb-0">PHÒNG</h2>
-          <div class="text-gray-700 font-medium mb-2 md:mb-0">Chọn lọc theo:</div>
-          <div class="mt-4 md:mt-0 flex flex-wrap gap-2">
-            <select name="popular" class="border border-gray-300 rounded px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-teal-500">
-              <option value="">Bộ lọc phổ biến</option>
-              <option value="hot" {% if filter_popular == 'hot' %}selected{% endif %}>Hot</option>
-              <option value="giamgia" {% if filter_popular == 'giamgia' %}selected{% endif %}>Giảm giá</option>
-              <option value="mienphi" {% if filter_popular == 'mienphi' %}selected{% endif %}>Miễn phí hủy</option>
-            </select>
-            <select name="tiennghi" class="border border-gray-300 rounded px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-teal-500">
-              <option value="">Tiện nghi</option>
-              <option value="wifi" {% if filter_tiennghi == 'wifi' %}selected{% endif %}>Wi-Fi miễn phí</option>
-              <option value="hovoi" {% if filter_tiennghi == 'hovoi' %}selected{% endif %}>Hồ bơi</option>
-              <option value="dondonbay" {% if filter_tiennghi == 'dondonbay' %}selected{% endif %}>Đưa đón sân bay</option>
-              <option value="phonggiadinh" {% if filter_tiennghi == 'phonggiadinh' %}selected{% endif %}>Phòng gia đình</option>
-            </select>
-            <select name="xephang" class="border border-gray-300 rounded px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-teal-500">
-              <option value="">Xếp hạng</option>
-              <option value="5" {% if filter_xephang == '5' %}selected{% endif %}>5 sao</option>
-              <option value="4" {% if filter_xephang == '4' %}selected{% endif %}>4 sao</option>
-              <option value="3" {% if filter_xephang == '3' %}selected{% endif %}>3 sao</option>
-              <option value="2" {% if filter_xephang == '2' %}selected{% endif %}>2 sao</option>
-              <option value="1" {% if filter_xephang == '1' %}selected{% endif %}>1 sao</option>
-            </select>
-            <select name="rating" class="border border-gray-300 rounded px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-teal-500">
-              <option value="">Điểm đánh giá</option>
-              <option value="9" {% if filter_rating == '9' %}selected{% endif %}>9+ Xuất sắc</option>
-              <option value="8" {% if filter_rating == '8' %}selected{% endif %}>8+ Rất tốt</option>
-              <option value="7" {% if filter_rating == '7' %}selected{% endif %}>7+ Tốt</option>
-            </select>
-          </div>
-        </div>
-      </div>
-  
-      <!-- Grid danh mục phòng -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {% for room in rooms %}
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-          <img src="{{ room.image_url if room.image_url else url_for('static', filename='images/default.jpg') }}"
-               {% if room.image_url and room.image_url_hd %}
-                 srcset="{{ room.image_url }} 1x, {{ room.image_url_hd }} 2x"
-               {% endif %}
-               alt="Phòng {{ room.SoPhong }}"
-               class="w-full h-48 object-cover">
-          <div class="p-4 flex flex-col">
-            <h3 class="text-xl font-bold">Phòng {{ room.SoPhong }}</h3>
-            <p class="text-gray-600 mb-2">{{ room.MoTa }}</p>
-            <p class="text-gray-600 mb-2">Giá phòng: {{ room.price or 0 }} VND/đêm</p>
-            <p class="text-gray-600 mb-2">Trạng thái: {{ room.TrangThai }}</p>
-            <a href="{{ url_for('booking', room_id=room.MaPhong) }}?checkin=2025-03-24&checkout=2025-03-25"
-               class="mt-auto bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-md self-end">
-              Xem phòng
-            </a>
+          <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <img src="{{ room.image_url if room.image_url else '/static/images/default.jpg' }}" 
+                 {% if room.image_url and room.image_url_hd %}
+                   srcset="{{ room.image_url }} 1x, {{ room.image_url_hd }} 2x"
+                 {% endif %}
+                 alt="Phòng {{ room.SoPhong }}"
+                 class="w-full h-48 object-cover">
+            <div class="p-4 flex flex-col">
+              <h3 class="text-xl font-bold">Phòng {{ room.SoPhong }}</h3>
+              <p class="text-gray-600 mb-2">{{ room.MoTa }}</p>
+              <p class="text-gray-600 mb-2">Giá phòng: {{ room.price or 0 }} VND/đêm</p>
+              <p class="text-gray-600 mb-2">Trạng thái: {{ room.TrangThai }}</p>
+              <a href="{{ url_for('booking', room_id=room.MaPhong) }}?checkin={{ checkin|default('2025-03-24') }}&checkout={{ checkout|default('2025-03-25') }}"
+                 class="mt-auto bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-md self-end">
+                Xem phòng
+              </a>
+            </div>
           </div>
-        </div>
         {% endfor %}
       </div>
     </section>
   </main>
-  
+
   <!-- Chat Widget (nếu có) -->
   <div id="chat-widget" class="fixed bottom-6 right-6 z-50">
     <button id="chat-toggle" class="bg-blue-500 rounded-full p-3 shadow-lg focus:outline-none">
@@ -187,12 +218,14 @@
       </div>
     </div>
   </div>
-  
+
   <footer class="bg-gray-800 text-white text-center py-4">
     <p>© 2025 Keiwei00 Hotel</p>
   </footer>
-  
+
   <!-- External JS -->
   <script src="{{ url_for('static', filename='script.js') }}"></script>
+  
+  
 </body>
 </html>
