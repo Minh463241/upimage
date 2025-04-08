@@ -18,10 +18,10 @@
   <header class="bg-white shadow-md fixed w-full z-20">
     <div class="container mx-auto flex justify-between items-center py-4 px-6">
       <div class="text-2xl font-light italic">
-        <a href="{{ url_for('index') }}">Keiwei00 Hotel</a>
+        <a href="{{ url_for('user.index') }}">Keiwei00 Hotel</a>
       </div>
       <nav class="space-x-4">
-        <a class="text-gray-600 hover:text-gray-800" href="{{ url_for('index') }}">Trang Chủ</a>
+        <a class="text-gray-600 hover:text-gray-800" href="{{ url_for('user.index') }}">Trang Chủ</a>
       </nav>
     </div>
   </header>
@@ -31,7 +31,7 @@
     <section class="container mx-auto py-12">
       <div class="bg-white p-6 rounded-md shadow-md">
         <h2 class="text-2xl font-semibold mb-4">Chỉnh Sửa Thông Tin Cá Nhân</h2>
-        <form action="{{ url_for('edit_profile') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+        <form action="{{ url_for('user.edit_profile') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
           <div>
             <label for="ho_ten" class="block text-gray-700">Họ Tên</label>
             <input type="text" id="ho_ten" name="ho_ten" value="{{ customer.HoTen }}" class="w-full border rounded px-3 py-2">
@@ -64,7 +64,7 @@
             <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
               Lưu Thay Đổi
             </button>
-            <a href="{{ url_for('profile') }}" class="text-gray-600 hover:underline">
+            <a href="{{ url_for('user.profile') }}" class="text-gray-600 hover:underline">
               Hủy bỏ
             </a>
           </div>

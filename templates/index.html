@@ -26,10 +26,10 @@
   <header class="bg-white shadow-md fixed w-full z-20">
     <div class="container mx-auto flex justify-between items-center py-4 px-6">
       <div class="text-2xl font-light italic">
-        <a href="{{ url_for('index') }}">Keiwei00 Hotel</a>
+        <a href="{{ url_for('user.index') }}">Keiwei00 Hotel</a>
       </div>
       <nav class="space-x-4">
-        <a class="text-gray-600 hover:text-gray-800" href="{{ url_for('index') }}">Trang Chủ</a>
+        <a class="text-gray-600 hover:text-gray-800" href="{{ url_for('user.index') }}">Trang Chủ</a>
         <a class="text-gray-600 hover:text-gray-800" href="#">Phòng</a>
         <a class="text-gray-600 hover:text-gray-800" href="#">Tiện Nghi</a>
         <a class="text-gray-600 hover:text-gray-800" href="#">Liên Hệ</a>
@@ -37,7 +37,7 @@
       </nav>
       <div class="flex items-center space-x-2">
         {% if user_email %}
-          <a href="{{ url_for('profile') }}" title="Trang cá nhân">
+          <a href="{{ url_for('user.profile') }}" title="Trang cá nhân">
             <img src="{{ url_for('static', filename='avatars/' ~ user_avatar) }}"
                  srcset="{{ url_for('static', filename='avatars/' ~ user_avatar) }} 1x, {{ url_for('static', filename='avatars/' ~ user_avatar_hd) }} 2x"
                  alt="User avatar"
@@ -46,10 +46,10 @@
                  height="30">
           </a>
         {% else %}
-          <a class="text-gray-600 hover:text-gray-800" href="{{ url_for('login') }}">Đăng nhập</a>
+          <a class="text-gray-600 hover:text-gray-800" href="{{ url_for('user.login') }}">Đăng nhập</a>
         {% endif %}
-        <a class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600" href="{{ url_for('change_language', lang='en') }}">EN</a>
-        <a class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600" href="{{ url_for('change_language', lang='vi') }}">VI</a>
+        <a href="{{ url_for('utility.change_language', lang='en') }}">EN</a>
+        <a href="{{ url_for('utility.change_language', lang='vi') }}">VI</a>
       </div>
     </div>
   </header>
@@ -86,7 +86,7 @@
       <div class="hero-content flex items-center justify-center h-full text-center text-white">
         <div class="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-3/4 lg:w-2/3 text-gray-800">
           <h2 class="text-xl font-bold mb-4">Tìm Phòng</h2>
-          <form action="{{ url_for('search') }}" method="get">
+          <form action="{{ url_for('user.search') }}" method="get">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               <div>
                 <label class="block font-medium mb-1" for="checkin">Ngày Nhận Phòng</label>
@@ -188,7 +188,7 @@
               <p class="text-gray-600 mb-2">{{ room.MoTa }}</p>
               <p class="text-gray-600 mb-2">Giá phòng: {{ room.price or 0 }} VND/đêm</p>
               <p class="text-gray-600 mb-2">Trạng thái: {{ room.TrangThai }}</p>
-              <a href="{{ url_for('booking', room_id=room.MaPhong) }}?checkin={{ checkin|default('2025-03-24') }}&checkout={{ checkout|default('2025-03-25') }}"
+              <a href="{{ url_for('user.booking', room_id=room.MaPhong) }}?checkin={{ checkin|default('2025-03-24') }}&checkout={{ checkout|default('2025-03-25') }}"
                  class="mt-auto bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-md self-end">
                 Xem phòng
               </a>

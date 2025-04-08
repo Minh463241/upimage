@@ -7,3 +7,4 @@ dnspython==2.3.0
 Flask-SQLAlchemy==3.1.1
 flask_cors
 stripe
+paypalrestsdk==1.13.1

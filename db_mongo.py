@@ -57,8 +57,19 @@ def update_customer(email, update_data):
 # ĐẶT PHÒNG
 # ---------------------------
 def create_booking(booking_data):
+    # Loại bỏ trường MaDatPhong nếu có để tránh trùng lặp
+    booking_data.pop('MaDatPhong', None)
     result = bookings_collection.insert_one(booking_data)
-    return str(result.inserted_id)
+    inserted_id = result.inserted_id
+    inserted_id_str = str(inserted_id)
+    # Cập nhật lại document với mã đặt phòng bằng giá trị của _id (dạng chuỗi)
+    update_result = bookings_collection.update_one(
+        {'_id': inserted_id},
+        {'$set': {'MaDatPhong': inserted_id_str}}
+    )
+    if update_result.modified_count == 0:
+        print("[Warning] Không thể cập nhật MaDatPhong cho document vừa chèn.")
+    return inserted_id_str
 
 def get_booking_by_id(ma_dat_phong):
     return bookings_collection.find_one({'MaDatPhong': ma_dat_phong})
@@ -126,7 +137,6 @@ def create_room_type(room_type_data):
 
 # Alias để dùng trong app
 add_room_type = create_room_type
-
 
 # ---------------------------
 # ẢNH PHÒNG
@@ -225,7 +235,8 @@ def get_room_by_id(ma_phong):
 def update_room(ma_phong, update_data):
     result = rooms_collection.update_one({'MaPhong': ma_phong}, {'$set': update_data})
     return result.modified_count
-#tìm kiếm phòng
+
+# Tìm kiếm phòng
 def get_rooms_by_filters(filters):
     """
     filters: dict chứa các tiêu chí tìm kiếm. Ví dụ:
@@ -266,7 +277,6 @@ def get_rooms_by_filters(filters):
     # In ra query để debug
     print("[DEBUG] Query tìm kiếm:", query)
     return list(rooms_collection.find(query))
-
 
 # ---------------------------
 # NHÂN VIÊN (Admin)

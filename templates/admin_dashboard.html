@@ -23,7 +23,7 @@
       </div>
       <nav class="flex-1 px-2 py-4 space-y-1">
         <div class="text-gray-400 uppercase text-xs font-bold">Quản trị</div>
-        <a class="flex items-center px-2 py-2 text-sm font-medium text-white bg-gray-900 rounded-md" href="{{ url_for('admin_dashboard') }}">
+        <a class="flex items-center px-2 py-2 text-sm font-medium text-white bg-gray-900 rounded-md" href="{{ url_for('admin.admin_dashboard') }}">
             <i class="fas fa-home mr-2"></i> Trang chủ
         </a>
         <a class="flex items-center px-2 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-700 rounded-md" href="/admin/roles">
@@ -39,10 +39,10 @@
             <i class="fas fa-newspaper mr-2"></i> Tin tức
         </a>
         <div class="text-gray-400 uppercase text-xs font-bold mt-4">Danh mục</div>
-        <a class="flex items-center px-2 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-700 rounded-md" href="{{url_for('add_room_type_route')}}">
+        <a class="flex items-center px-2 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-700 rounded-md" href="{{url_for('admin.add_room_type_route')}}">
             <i class="fas fa-th-large mr-2"></i> Loại phòng
         </a>
-        <a class="flex items-center px-2 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-700 rounded-md" href="{{ url_for('add_room') }}">
+        <a class="flex items-center px-2 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-700 rounded-md" href="{{ url_for('admin.add_room') }}">
             <i class="fas fa-plus-circle mr-2"></i> Thêm Phòng
         </a>
         <a class="flex items-center px-2 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-700 rounded-md" href="/admin/services">

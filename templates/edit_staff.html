@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container mx-auto p-6">
     <h2 class="text-2xl font-bold mb-6">Sửa Thông Tin Nhân Viên</h2>
-    <form action="{{ url_for('edit_staff_route', staff_id=staff._id) }}" method="POST" class="max-w-md mx-auto">
+    <form action="{{ url_for('admin.edit_staff_route', staff_id=staff._id) }}" method="POST" class="max-w-md mx-auto">
         <div class="mb-4">
             <label for="HoTen" class="block text-gray-700">Họ và Tên</label>
             <input type="text" name="HoTen" id="HoTen" value="{{ staff.HoTen }}" class="w-full border px-3 py-2 rounded" required>
